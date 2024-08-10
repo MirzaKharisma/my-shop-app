@@ -12,16 +12,16 @@ class UserRepository{
     }
 
     public function findByEmail($email){
-        return $this->userModel::query()->where('email', $email)->first();
+        return $this->userModel->query()->where('email', $email)->first();
     }
 
     public function isEmailUnique($email)
     {
-        return $this->userModel::query()->where('email', $email)->doesntExist();
+        return $this->userModel->query()->where('email', $email)->doesntExist();
     }
 
     public function createUser(array $userData)
     {
-        return $this->userModel::query()->create($userData);
+        return $this->userModel->query()->create($userData);
     }
 }

@@ -3,6 +3,7 @@
 namespace App\Services;
 
 use App\Repositories\UserRepository;
+use Illuminate\Support\Facades\Hash;
 use PHPOpenSourceSaver\JWTAuth\Exceptions\JWTException;
 use PHPOpenSourceSaver\JWTAuth\Facades\JWTAuth;
 
@@ -19,15 +20,20 @@ class AuthService
     {
         if ($this->userRepository->isEmailUnique($userData['email'])) {
 
-            $userData['password'] = bcrypt($userData['password']);
+            $userData['password'] = Hash::make($userData['password']);
 
             $user = $this->userRepository->createUser($userData);
 
-            return $user;
+            return [
+                'status' => true,
+                'data' => $user
+            ];
         }
 
         // Handle duplicate email scenario
-        return null;
+        return [
+            'status' => false
+        ];
     }
 
     public static function login($email, $password){

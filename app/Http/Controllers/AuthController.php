@@ -17,24 +17,25 @@ class AuthController extends Controller
 
     public function register(RegisterUserRequest $request)
     {
-        // Validate input using RegisterUserRequest
-        $validatedData = $request->validated();
-
-        // Call the registerUser method from the UserService
-        $user = $this->authService->registerUser($validatedData);
-
-        if ($user) {
-            // Registration successful
+        if(isset($request->validator) && $request->validator->fails()){
             return response()->json([
-                'message' => 'User registered successfully',
-                'user' => $user
-            ], 201);
+                    'message' => $request->validator->errors()
+            ], 422);
         }
 
-        // Handle registration failure
+        $payload = $request->only(['name', 'email', 'password']);
+        $user = $this->authService->registerUser($payload);
+
+        if(!$user['status']){
+            return response()->json([
+                "message" => "create user failed"
+            ], 400);
+        }
+
         return response()->json([
-            'message' => 'User registration failed. Email exists.'
-        ], 422);
+            "message" => "create user successfully",
+            "data" => $user['data']
+        ]);
     }
 
     public function login(AuthRequest $request)
